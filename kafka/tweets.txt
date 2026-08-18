@@ -1,0 +1,18 @@
+I love Apache Spark
+This movie is amazing
+I hate this product
+Worst experience ever
+The food was delicious
+I am very happy today
+I feel terrible
+Fantastic performance
+Bad service
+Spark MLlib is awesome
+Hadoop is very useful
+Kafka streaming is excellent
+I don't like this app
+This phone is horrible
+Excellent customer support
+
+
+

@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.ipynb_checkpoints/
+logs/
+
+
+
+data/trainingandtestdata.zip
+data/training.1600000.processed.noemoticon.csv
