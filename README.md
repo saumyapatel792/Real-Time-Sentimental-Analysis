@@ -108,7 +108,7 @@ RealTimeSentimentAnalysis/
   - Connects to Kafka bootstrap server on `sentiment_inputs`.
   - Parses JSON records into Spark SQL DataFrame schema.
   - Applies `analyze_sentiment` as a Spark UDF (`spark_sentiment_udf`).
-  - Writes processed stream to Kafka topic `sentiment_results` and stdout Console Sink.
+  - Writes processed stream to Kafka topic `sentiment_results`.
 
 ### `spark/train_model.py`
 - **Role**: Spark MLlib batch classification trainer.
