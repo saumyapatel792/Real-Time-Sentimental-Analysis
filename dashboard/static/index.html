@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Sentiment Stream | Big Data Pipeline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dark-theme">
+    <!-- Background Ambient Glows -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+
+    <div class="app-container">
+        <!-- Top Navigation / Header -->
+        <header class="top-nav">
+            <div class="brand-group">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-title">BigData Sentiment Engine</h1>
+                    <p class="brand-subtitle">Kafka • PySpark Structured Streaming • NLP Pipeline</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="connection-badge" id="connStatusBadge">
+                    <span class="pulse-dot"></span>
+                    <span id="connStatusText">Connected to Stream</span>
+                </div>
+                <div class="live-counter-pill">
+                    <span class="pill-label">Throughput</span>
+                    <span class="pill-value" id="throughputValue">0.00 /s</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Pipeline Architecture Visualizer -->
+        <section class="architecture-card glass-panel">
+            <div class="arch-header">
+                <span class="section-tag">DATA PROCESSING PIPELINE</span>
+                <div class="arch-controls">
+                    <button class="btn-ctrl" id="btnToggleStream">
+                        <span class="btn-icon" id="streamIcon">⏸</span>
+                        <span id="streamBtnText">Pause Stream</span>
+                    </button>
+                    <div class="speed-selector">
+                        <span>Speed:</span>
+                        <button class="speed-btn" data-speed="0.5">0.5s</button>
+                        <button class="speed-btn active" data-speed="2.0">2.0s</button>
+                        <button class="speed-btn" data-speed="4.0">4.0s</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pipeline-flow">
+                <div class="pipe-node active-node" id="nodeInput">
+                    <div class="node-icon">📥</div>
+                    <div class="node-content">
+                        <h4>Input / Dataset</h4>
+                        <p>Sentiment Data</p>
+                    </div>
+                </div>
+                <div class="pipe-connector active-connector"><div class="connector-line"></div><div class="stream-particle"></div></div>
+
+                <div class="pipe-node active-node" id="nodeKafka">
+                    <div class="node-icon">⚡</div>
+                    <div class="node-content">
+                        <h4>Apache Kafka</h4>
+                        <p>Data Streaming</p>
+                    </div>
+                </div>
+                <div class="pipe-connector active-connector"><div class="connector-line"></div><div class="stream-particle"></div></div>
+
+                <div class="pipe-node active-node" id="nodeSpark">
+                    <div class="node-icon">🔥</div>
+                    <div class="node-content">
+                        <h4>Apache Spark</h4>
+                        <p>Stream Processing</p>
+                    </div>
+                </div>
+                <div class="pipe-connector active-connector"><div class="connector-line"></div><div class="stream-particle"></div></div>
+
+                <div class="pipe-node active-node" id="nodeModel">
+                    <div class="node-icon">🧠</div>
+                    <div class="node-content">
+                        <h4>Sentiment ML Model</h4>
+                        <p>Positive / Negative</p>
+                    </div>
+                </div>
+                <div class="pipe-connector active-connector"><div class="connector-line"></div><div class="stream-particle"></div></div>
+
+                <div class="pipe-node active-node" id="nodeOutput">
+                    <div class="node-icon">📊</div>
+                    <div class="node-content">
+                        <h4>Output Sink</h4>
+                        <p>Processed Results</p>
+                    </div>
+                </div>
+                <div class="pipe-connector active-connector"><div class="connector-line"></div><div class="stream-particle"></div></div>
+
+                <div class="pipe-node active-node" id="nodeDashboard">
+                    <div class="node-icon">📈</div>
+                    <div class="node-content">
+                        <h4>Dashboard</h4>
+                        <p>Live Visualization</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KPI Metrics Grid -->
+        <section class="kpi-grid">
+            <div class="kpi-card glass-panel kpi-total">
+                <div class="kpi-icon-wrap">📊</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">TOTAL PROCESSED</span>
+                    <h2 class="kpi-value" id="kpiTotal">0</h2>
+                </div>
+                <span class="kpi-badge total-badge">Real-Time</span>
+            </div>
+
+            <div class="kpi-card glass-panel kpi-positive">
+                <div class="kpi-icon-wrap">😊</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">POSITIVE SENTIMENT</span>
+                    <div class="kpi-stat-row">
+                        <h2 class="kpi-value" id="kpiPositive">0</h2>
+                        <span class="kpi-percent" id="kpiPosPct">0.0%</span>
+                    </div>
+                </div>
+                <div class="mini-progress-bar"><div class="progress-fill pos-fill" id="posProgressBar" style="width: 0%"></div></div>
+            </div>
+
+            <div class="kpi-card glass-panel kpi-negative">
+                <div class="kpi-icon-wrap">😞</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">NEGATIVE SENTIMENT</span>
+                    <div class="kpi-stat-row">
+                        <h2 class="kpi-value" id="kpiNegative">0</h2>
+                        <span class="kpi-percent" id="kpiNegPct">0.0%</span>
+                    </div>
+                </div>
+                <div class="mini-progress-bar"><div class="progress-fill neg-fill" id="negProgressBar" style="width: 0%"></div></div>
+            </div>
+
+            <div class="kpi-card glass-panel kpi-neutral">
+                <div class="kpi-icon-wrap">😐</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">NEUTRAL SENTIMENT</span>
+                    <div class="kpi-stat-row">
+                        <h2 class="kpi-value" id="kpiNeutral">0</h2>
+                        <span class="kpi-percent" id="kpiNeuPct">0.0%</span>
+                    </div>
+                </div>
+                <div class="mini-progress-bar"><div class="progress-fill neu-fill" id="neuProgressBar" style="width: 0%"></div></div>
+            </div>
+
+            <div class="kpi-card glass-panel kpi-polarity">
+                <div class="kpi-icon-wrap">🧭</div>
+                <div class="kpi-info">
+                    <span class="kpi-label">AVG POLARITY</span>
+                    <h2 class="kpi-value" id="kpiPolarity">0.00</h2>
+                </div>
+                <div class="polarity-meter">
+                    <div class="polarity-pointer" id="polarityPointer" style="left: 50%;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Testing Console -->
+        <section class="test-console-card glass-panel">
+            <div class="console-header">
+                <h3>🧪 Interactive Live Inference Console</h3>
+                <span class="hint-text">Type any custom text or click sample presets below to process instantly through the pipeline:</span>
+            </div>
+
+            <div class="input-action-bar">
+                <div class="input-wrapper">
+                    <input type="text" id="customTextInput" placeholder="Type a sentence (e.g. 'This movie was fantastic!')..." autocomplete="off">
+                </div>
+                <button class="btn-primary" id="btnSendText">
+                    <span>Analyze & Stream</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+
+            <div class="preset-chips">
+                <span class="preset-label">Test Cases:</span>
+                <button class="chip-btn pos-chip" data-text="This movie was fantastic!">
+                    <span>"This movie was fantastic!"</span>
+                    <span class="chip-tag">😊 Positive</span>
+                </button>
+                <button class="chip-btn pos-chip" data-text="I really enjoyed this product.">
+                    <span>"I really enjoyed this product."</span>
+                    <span class="chip-tag">😊 Positive</span>
+                </button>
+                <button class="chip-btn neg-chip" data-text="The movie was boring.">
+                    <span>"The movie was boring."</span>
+                    <span class="chip-tag">😞 Negative</span>
+                </button>
+                <button class="chip-btn neg-chip" data-text="This was a terrible experience.">
+                    <span>"This was a terrible experience."</span>
+                    <span class="chip-tag">😞 Negative</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Main Dashboard Split: Visual Analytics & Real-Time Feed -->
+        <div class="main-grid">
+            <!-- Left Column: Visual Analytics -->
+            <div class="charts-column">
+                <div class="card glass-panel chart-card">
+                    <div class="card-header">
+                        <h3>Sentiment Distribution</h3>
+                        <span class="card-subtitle">Real-time breakdown ratio</span>
+                    </div>
+                    <div class="chart-container-donut">
+                        <canvas id="sentimentDonutChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card glass-panel chart-card">
+                    <div class="card-header">
+                        <h3>Polarity Stream Timeline</h3>
+                        <span class="card-subtitle">Last 30 streaming records</span>
+                    </div>
+                    <div class="chart-container-line">
+                        <canvas id="polarityTimelineChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card glass-panel keywords-card">
+                    <div class="card-header">
+                        <h3>Top Detected Keywords</h3>
+                        <span class="card-subtitle">NLP Lexicon Frequency</span>
+                    </div>
+                    <div class="keywords-wrap" id="keywordsContainer">
+                        <span class="keyword-pill">fantastic (x4)</span>
+                        <span class="keyword-pill">enjoyed (x3)</span>
+                        <span class="keyword-pill neg">terrible (x3)</span>
+                        <span class="keyword-pill neg">boring (x2)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Live Stream Feed -->
+            <div class="stream-column">
+                <div class="card glass-panel stream-card">
+                    <div class="stream-header">
+                        <div class="stream-title-group">
+                            <div class="live-stream-dot"></div>
+                            <h3>Live Processed Feed</h3>
+                            <span class="stream-count" id="feedCountTag">(0 items)</span>
+                        </div>
+                        <div class="stream-actions">
+                            <button class="btn-clear" id="btnClearFeed" title="Clear table">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="stream-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 12%;">Time</th>
+                                    <th style="width: 48%;">Input Text</th>
+                                    <th style="width: 22%;">Sentiment</th>
+                                    <th style="width: 18%;">Polarity / Conf</th>
+                                </tr>
+                            </thead>
+                            <tbody id="streamTableBody">
+                                <!-- Dynamic rows inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
